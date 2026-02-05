@@ -38,7 +38,6 @@ It aims to digitize and simplify the food ordering process in university canteen
 ## 📂 Project Structure
 
 smart_canteen/
-│
 ├── accounts/ # Authentication, profiles, user management
 ├── canteen/ # Menu, cart, orders, payments
 ├── food_images/ # Food item images
