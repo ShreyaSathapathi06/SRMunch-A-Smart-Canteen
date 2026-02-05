@@ -35,7 +35,6 @@ It aims to digitize and simplify the food ordering process in university canteen
 
 ---
 
-## 📂 Project Structure
 
 ## 📁 Project Structure
 
