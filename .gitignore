@@ -15,3 +15,13 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+
