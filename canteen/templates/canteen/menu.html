@@ -1,0 +1,337 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SRMunch Menu</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+
+<style>
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+</style>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="nav-left">
+        <img src="{% static 'canteen/logo.png' %}" class="logo">
+        <span class="brand">SRMunch</span>
+        
+    </div>
+
+    <div class="nav-center">
+        MENU
+    </div>
+
+    <div class="nav-right">
+        <select onchange="location = this.value;" class="category-dropdown">
+            <option value="">Jump to Category 🍽️</option>
+            {% for category, items in categories.items %}
+                <option value="#cat-{{ forloop.counter }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+
+        <a href="{% url 'view_cart' %}" class="cart-link">Cart 🛒</a>
+         {% if user.is_authenticated %}
+        <div class="profile-container">
+    <img
+        src="{{ user.studentprofile.profile_pic.url }}"
+        class="profile-pic"
+        id="profilePic"
+    >
+
+    <div class="profile-dropdown" id="profileMenu">
+        <div class="profile-info">
+            <strong>{{ user.studentprofile.full_name }}</strong>
+        </div>
+
+        <a href="{% url 'student_profile' %}">📦 Order History</a>
+        <a href="{% url 'edit_profile' %}">✏️ Edit Profile</a>
+        <hr>
+        <a href="{% url 'logout' %}" class="logout">🚪 Logout</a>
+    </div>
+</div>
+
+        {% endif %}
+
+    </div>
+</div>
+{% if messages %}
+<div style="padding: 10px;">
+    {% for message in messages %}
+        <div style="
+            background: {% if message.tags == 'error' %}#ff4d4d{% else %}#4caf50{% endif %};
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            color: black;
+            font-weight: bold;
+        ">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN LAYOUT -->
+<div class="page-container">
+
+    <!-- MENU SIDE -->
+    <div class="menu-side">
+
+        {% for category, items in categories.items %}
+        <h2 id="cat-{{ forloop.counter }}" class="category-title">{{ category }}</h2>
+
+        <div class="menu-grid">
+            {% for stock in items %}
+            <div class="menu-item">
+
+                {% if stock.food.image %}
+                    <img src="{{ stock.food.image.url }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/220x150.png?text=No+Image">
+                {% endif %}
+
+                <h3>{{ stock.food.name }}</h3>
+                <p class="price">₹{{ stock.food.price }}</p>
+                <p class="stock">Available: {{ stock.quantity_available }}</p>
+                <button onclick="addToCartAjax({{ stock.id }})">Add ➕</button>
+
+                 </div>
+            {% endfor %}
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- MINI CART SIDE -->
+<!-- MINI CART SIDE -->
+<div class="mini-cart">
+    <h3>🛒 Your Cart</h3>
+
+    <div class="mini-cart-items">
+        {% if cart_items %}
+            {% for item in cart_items %}
+                <div class="mini-cart-item">
+                    <span>{{ item.name }}</span>
+
+                    <div class="qty-controls">
+                        <button type="button" onclick="changeQty('{{ item.id }}','decrease')">➖</button>
+                        <span id="qty-{{ item.id }}">{{ item.qty }}</span>
+                        <button type="button" onclick="changeQty('{{ item.id }}','increase')">➕</button>
+                    </div>
+
+                    <span>₹{{ item.total }}</span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center;">No items yet</p>
+        {% endif %}
+    </div>
+
+    <!-- Total & View Cart button fixed at bottom -->
+    {% if cart_items %}
+    <div class="mini-cart-footer">
+        <div class="mini-total" id="mini-total">Total: ₹{{ cart_total }}</div>
+        <a href="{% url 'view_cart' %}" class="view-cart-btn">View Full Cart</a>
+    </div>
+    {% endif %}
+</div>
+
+    </div>
+
+</div>
+<script>
+
+// CATEGORY JUMP FIX (navbar safe)
+document.querySelector('.category-dropdown').addEventListener('change', function(){
+    let target = document.querySelector(this.value);
+    if(target){
+        let offset = 95;
+        window.scrollTo({
+            top: target.offsetTop - offset,
+            behavior: 'smooth'
+        });
+    }
+});
+
+// MINI CART + / -
+function changeQty(stockId, action){
+    fetch(`/ajax/${action}/${stockId}/`)
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        if(data.item_qty === 0){
+            location.reload();
+            return;
+        }
+
+        document.getElementById("qty-" + stockId).innerText = data.item_qty;
+        document.getElementById("mini-total").innerText = "Total: ₹" + data.cart_total;
+    })
+    .catch(err => console.log(err));
+}
+
+// ADD TO CART FROM MENU
+function addToCartAjax(stockId){
+    fetch(`/ajax/increase/${stockId}/`)
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        const miniCartItems = document.querySelector(".mini-cart-items");
+        const qtySpan = document.getElementById("qty-" + stockId);
+
+        // Remove "No items yet" if present
+        const emptyMsg = miniCartItems.querySelector("p");
+        if(emptyMsg){
+            emptyMsg.remove();
+        }
+
+        if(qtySpan){
+            // Existing item → just update qty & total
+            qtySpan.innerText = data.item_qty;
+            const itemRow = qtySpan.closest(".mini-cart-item");
+            const price = parseFloat(itemRow.dataset.price);
+            itemRow.querySelector(".item-total").innerText = "₹" + (price * data.item_qty);
+        } else {
+            // New item → create div
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("mini-cart-item");
+            itemDiv.dataset.price = data.item_price;
+
+            itemDiv.innerHTML = `
+                <span>${data.item_name}</span>
+                <div class="qty-controls">
+                    <button type="button" onclick="changeQty('${stockId}','decrease')">➖</button>
+                    <span id="qty-${stockId}">${data.item_qty}</span>
+                    <button type="button" onclick="changeQty('${stockId}','increase')">➕</button>
+                </div>
+                <span class="item-total">₹${data.item_total}</span>
+            `;
+
+            miniCartItems.appendChild(itemDiv);
+
+            // Auto-scroll to newest item
+            miniCartItems.scrollTop = miniCartItems.scrollHeight;
+        }
+
+        // Update total
+        let miniTotal = document.getElementById("mini-total");
+
+        // If total doesn't exist yet (first item), create it with View Full Cart button
+        if(!miniTotal){
+            const footer = document.createElement("div");
+            footer.classList.add("mini-cart-footer");
+
+            footer.innerHTML = `
+                <div class="mini-total" id="mini-total">Total: ₹${data.cart_total}</div>
+                <a href="/cart/" class="view-cart-btn">View Full Cart</a>
+            `;
+            document.querySelector(".mini-cart").appendChild(footer);
+        } else {
+            miniTotal.innerText = "Total: ₹" + data.cart_total;
+        }
+    })
+    .catch(err => console.log(err));
+}
+function toggleProfileMenu(){
+    const menu = document.getElementById("profileMenu");
+    if(!menu) return;
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+document.addEventListener("click", function(e){
+    const profile = document.querySelector(".profile-container");
+    const menu = document.getElementById("profileMenu");
+    if(profile && menu && !profile.contains(e.target)){
+        menu.style.display = "none";
+    }
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const pic = document.getElementById("profilePic");
+    const menu = document.getElementById("profileMenu");
+
+    if (!pic || !menu) return;
+
+    pic.addEventListener("click", function (e) {
+        e.stopPropagation();
+        menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", function () {
+        menu.style.display = "none";
+    });
+});
+
+
+
+</script>
+
+
+
+
+</body>
+</html>
+

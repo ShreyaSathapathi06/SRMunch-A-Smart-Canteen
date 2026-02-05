@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile | SRMunch</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+    <style>
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+</style>
+</head>
+
+<body style="background:#0f1b33; font-family:'Segoe UI', sans-serif;">
+{% include "includes/navbar.html" with navbar_title="EDIT PROFILE" %}
+
+<div style="min-height:100vh; display:flex; justify-content:center; padding-top:50px;">
+    <form method="POST" enctype="multipart/form-data"
+          style="
+              background:#132440;
+              color:white;
+              padding:40px;
+              width:420px;
+              border-radius:16px;
+              box-shadow:0 0 22px rgba(0,0,0,0.5);
+          ">
+        {% csrf_token %}
+
+        <h2 style="text-align:center; margin-bottom:30px; color:#00e5ff;">
+            Edit Profile
+        </h2>
+
+        <!-- PROFILE PIC -->
+        <div style="text-align:center; margin-bottom:25px;">
+            <img
+                src="{% if student_profile.profile_pic %}
+                        {{ student_profile.profile_pic.url }}
+                     {% else %}
+                        {% static 'accounts/default.png' %}
+                     {% endif %}"
+                style="
+                    width:110px;
+                    height:110px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    border:3px solid #00e5ff;
+                    margin-bottom:12px;
+                "
+            >
+
+            <input type="file" name="profile_pic"
+                   style="
+                       display:block;
+                       margin:auto;
+                       color:#ccc;
+                   ">
+        </div>
+
+        <!-- FULL NAME -->
+        <label style="font-size:14px; color:#ff6b6b;">Full Name</label>
+        <input type="text" name="full_name" 
+               value="{{ student_profile.full_name }}"
+               required
+               style="
+                   width:100%;
+                   padding:12px;
+                   margin:8px 0 20px;
+                   border-radius:8px;
+                   border:none;
+                   background:#1a2e52;
+                   color:white;
+                   box-sizing: border-box;
+               ">
+
+        <!-- EMAIL (READ ONLY) -->
+        <label style="font-size:14px; color:#ff6b6b;">Email</label>
+        <input type="email"
+               value="{{ user.email }}"
+               disabled
+               style="
+                   width:100%;
+                   padding:12px;
+                   margin:8px 0 25px;
+                   border-radius:8px;
+                   border:none;
+                   background:#0f1b33;
+                   color:#aaa;
+                   box-sizing: border-box;
+               ">
+
+        <!-- SAVE BUTTON -->
+        <button type="submit"
+                style="
+                    width:100%;
+                    padding:12px;
+                    background:#00e5ff;
+                    color:#132440;
+                    font-weight:bold;
+                    border:none;
+                    border-radius:10px;
+                    cursor:pointer;
+                    font-size:15px;
+                ">
+            Save Changes
+        </button>
+
+        <a href="{% url 'student_profile' %}"
+           style="
+               display:block;
+               text-align:center;
+               margin-top:18px;
+               color:#aaa;
+               text-decoration:none;
+               font-size:14px;
+           ">
+            Cancel
+        </a>
+
+    </form>
+</div>
+
+</body>
+</html>

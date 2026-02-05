@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Successful - SRMunch</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+    <style>
+        .success-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #0f1b33;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            color: white;
+        }
+
+        .success-container h1 {
+            color: #4caf50;
+            margin-bottom: 10px;
+        }
+
+        .success-container h3 {
+            color: #00e5ff;
+            margin-bottom: 20px;
+        }
+
+        .order-summary {
+            text-align: left;
+            margin-top: 20px;
+            background: #132440;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .order-summary div {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #0f1b33;
+        }
+
+        .order-summary div:last-child {
+            border-bottom: none;
+        }
+
+        .total-line {
+            font-weight: bold;
+            color: #ff9f1c;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .success-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .success-actions a button {
+            background: #ff9f1c;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .success-actions a button:hover {
+            background: #e68a00;
+        }
+     
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+{% include "includes/navbar.html" with navbar_title="ORDER STATUS" %}
+
+<!-- SUCCESS CARD -->
+<div class="success-container">
+    <h1>✅ Order Placed Successfully!</h1>
+    <h3>Thank you for ordering from SRMunch</h3>
+
+    <!-- Token / Order ID -->
+    <h2 style="color:#ff9f1c; margin-top:10px;">
+        🎫 Your Token Number: {{ order.order_id }}
+    </h2>
+
+    <!-- Payment Method -->
+    <p style="color:#00e5ff; font-weight:bold;">
+        Payment Method: {{ payment_method }}
+    </p>
+
+    <!-- Receipt / Order Summary -->
+    <div class="order-summary">
+        {% for item in items %}
+            <div>
+                <span>{{ item.name }} × {{ item.qty }}</span>
+                <span>₹{{ item.subtotal|floatformat:2 }}</span>
+            </div>
+        {% endfor %}
+
+        <div class="total-line">
+            <span>Total</span>
+            <span>₹{{ total|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <!-- Download & Back buttons -->
+    <div class="success-actions">
+        <a href="{% url 'download_receipt' order.order_id %}">
+            <button>📄 Download Receipt</button>
+        </a>
+
+        <a href="{% url 'menu' %}">
+            <button>⬅ Back to Menu</button>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SRMunch Payment</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+    <style>
+        .payment-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #0f1b33;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            color: white;
+        }
+
+        .payment-container h2 {
+            text-align: center;
+            color: #ff9f1c;
+            margin-bottom: 30px;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-method {
+            background: #132440;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .payment-method:hover {
+            background: #ff9f1c;
+            color: black;
+        }
+
+        .selected {
+            border: 2px solid #00e5ff;
+        }
+
+        .pay-btn {
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            background: #00e5ff;
+            color: black;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .pay-btn:hover {
+            background: #00bcd4;
+        }
+
+        .amount {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #ff9f1c;
+        }
+   
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+{% include "includes/navbar.html" with navbar_title="PAYMENT" %}
+
+<div class="payment-container">
+    <h2>Choose Payment Method</h2>
+
+    <div class="amount">
+        Total Amount: ₹{{total }}
+    </div>
+
+    <div class="payment-methods">
+        <div class="payment-method" data-method="upi">UPI</div>
+        <div class="payment-method" data-method="card">Card</div>
+        <div class="payment-method" data-method="cash">Cash</div>
+    </div>
+
+    <button class="pay-btn" onclick="proceedPayment()">Proceed to Pay</button>
+</div>
+
+<script>
+let selectedMethod = null;
+
+// highlight selection
+document.querySelectorAll('.payment-method').forEach(el => {
+    el.addEventListener('click', () => {
+        document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedMethod = el.dataset.method;
+    });
+});
+
+function proceedPayment() {
+    if(!selectedMethod){
+        alert("Please select a payment method!");
+        return;
+    }
+
+    // For now: just simulate payment
+    alert("Payment method: " + selectedMethod + "\nPayment successful!");
+   window.location.href = "{% url 'payment_success' %}?method=" + selectedMethod;
+
+}
+</script>
+
+</body>
+</html>

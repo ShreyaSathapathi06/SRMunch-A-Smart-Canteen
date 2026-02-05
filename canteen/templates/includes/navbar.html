@@ -1,0 +1,57 @@
+{% load static %}
+<div class="navbar"style="background:#132440" >
+    <div class="nav-left">
+        <img src="{% static 'canteen/logo.png' %}" class="logo">
+        <span class="brand">SRMunch</span>
+    </div>
+
+    <div class="nav-center">
+        {{ navbar_title|default:"MENU" }}
+    </div>
+
+    <div class="nav-right" >
+        {% if categories %}
+        <select onchange="location = this.value;" class="category-dropdown">
+            <option value="">Jump to Category 🍽️</option>
+            {% for category, items in categories.items %}
+                <option value="#cat-{{ forloop.counter }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        {% endif %}
+
+        <!-- MENU LINK INSTEAD OF CART -->
+        <a href="{% url 'menu' %}" class="cart-link" style="background:#0f1b33">Menu 🍽️</a>
+
+        {% if user.is_authenticated %}
+        <div class="profile-container">
+            <img src="{% if user.studentprofile.profile_pic %}{{ user.studentprofile.profile_pic.url }}{% else %}{% static 'accounts/default.png' %}{% endif %}"
+                 class="profile-pic" id="profilePic" onclick="toggleProfileMenu()">
+
+            <div class="profile-dropdown" id="profileMenu">
+                <div class="profile-info">
+                    <strong>{{ user.studentprofile.full_name }}</strong>
+                </div>
+                <a href="{% url 'student_profile' %}">📦 Order History</a>
+                <a href="{% url 'edit_profile' %}">✏️ Edit Profile</a>
+                <hr>
+                <a href="{% url 'logout' %}" class="logout">🚪 Logout</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleProfileMenu() {
+    const menu = document.getElementById("profileMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const profileContainer = document.querySelector('.profile-container');
+    if(profileContainer && !profileContainer.contains(event.target)){
+        document.getElementById("profileMenu").style.display = "none";
+    }
+});
+</script>

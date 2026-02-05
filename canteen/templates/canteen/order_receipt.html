@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Smart Canteen Receipt</title>
+    <style>
+        body {
+            font-family: DejaVu, sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .bill-box {
+            width: 100%;
+            border: 1px solid #000;
+            padding: 15px;
+            margin: auto;
+        }
+
+        .logo {
+            width: 100px;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 6px;
+            border-bottom: 1px solid #000;
+        }
+
+        th {
+            background: #f2f2f2;
+            text-align: left;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 13px;
+            border-top: 2px solid #000;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+           }
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+
+        
+    </style>
+</head>
+<body>
+
+    <div class="bill-box">
+        <!-- Logo -->
+        <img src="{{ logo_path }}" style="width:100px; display:block; margin: 0 auto 10px auto;">
+
+
+        <h2>SRMunch Receipt</h2>
+
+        <!-- Order Info -->
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Date:</strong> {{ order.date_time|date:"d-m-Y H:i" }}</p>
+        <p><strong>Payment:</strong> {{ order.payment_method }}</p>
+
+        <!-- Items Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="right">Price</th>
+                    <th class="right">Qty</th>
+                    <th class="right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.food.name }}</td>
+                    <td class="right">Rs. {{ item.price|floatformat:2 }}</td>
+                    <td class="right">{{ item.quantity }}</td>
+                    <td class="right">Rs. {{ item.price|floatformat:2|add:"0"|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="3" class="right">Grand Total</td>
+                    <td class="right">Rs. {{ order.total_amount|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <p class="footer">Thank you for ordering! Visit again :) </p>
+    </div>
+</body>
+</html>

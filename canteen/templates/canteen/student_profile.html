@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile | SRMunch</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+    <style>
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1b33;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+</style>
+</head>
+
+<body style="background:#0f1b33; font-family:'Segoe UI', sans-serif;">
+{% include "includes/navbar.html" with navbar_title="STUDENT PROFILE" %}
+<div style="min-height:100vh; display:flex; justify-content:center; padding-top:40px;">
+    <div style="
+        background:#132440;
+        color:white;
+        padding:35px;
+        width:750px;
+        border-radius:14px;
+        box-shadow:0 0 18px rgba(0,0,0,0.45);
+    ">
+
+        <!-- PROFILE HEADER -->
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        ">
+
+            <!-- LEFT: Avatar + Info -->
+            <div style="display:flex; align-items:center; gap:18px;">
+
+                <img
+                    src="{% if student_profile.profile_pic %}
+                            {{ student_profile.profile_pic.url }}
+                         {% else %}
+                            {% static 'accounts/default.png' %}
+                         {% endif %}"
+                    style="
+                        width:80px;
+                        height:80px;
+                        border-radius:50%;
+                        object-fit:cover;
+                        border:3px solid #00e5ff;
+                    "
+                >
+
+                <div>
+                    <h2 style="margin:0;">{{ student_profile.full_name }}</h2>
+                    <p style="margin:4px 0; color:#aaa;">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <!-- RIGHT: Logout -->
+            <a href="{% url 'logout' %}"
+               style="
+                   color:#ff6b6b;
+                   font-size:14px;
+                   text-decoration:none;
+               ">
+                Logout
+            </a>
+        </div>
+
+        <hr style="border:0; height:1px; background:#2a3f66; margin-bottom:25px;">
+
+        
+
+        <!-- ORDER HISTORY -->
+<h3 style="color:#ff9f1c; margin-bottom:15px;">Order History</h3>
+
+{% if orders %}
+    {% for order in orders %}
+        <div style="
+            background:#1a2e52;
+            padding:18px;
+            border-radius:10px;
+            margin-bottom:15px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
+
+            <!-- LEFT INFO -->
+            <div>
+                <div style="margin-bottom:6px;">
+                    <strong>Order ID:</strong> {{ order.order_id }}
+                </div>
+
+                <div style="color:#aaa; font-size:14px; margin-bottom:6px;">
+                    {{ order.date_time|date:"d M Y, h:i A" }}
+                </div>
+
+                <div>
+                    Total: <strong>₹{{ order.total_amount }}</strong>
+                </div>
+            </div>
+
+            <!-- RIGHT BUTTON -->
+            <a href="{% url 'download_receipt' order.order_id %}"
+               style="
+                   background:#00e5ff;
+                   padding:8px 14px;
+                   border-radius:8px;
+                   text-decoration:none;
+                   color:#132440;
+                   font-weight:bold;
+               ">
+                Download Receipt
+            </a>
+
+        </div>
+    {% endfor %}
+{% else %}
+    <p style="color:#aaa;">No orders yet.</p>
+{% endif %}
+
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SRMunch Cart</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+    <style>
+        /* CART TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #29354c; /* Dark card background like menu */
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center; /* Align all content center */
+            border-bottom: 1px solid #051125;
+        }
+        th {
+            background: #132440;
+            font-size: 16px;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* BUTTONS */
+        button {
+            background: #ff9f1c;
+            color: black;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #e68a00;
+        }
+
+        /* Cart Actions */
+        .cart-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .cart-actions h3 {
+            margin: 0;
+            color: #00e5ff;
+        }
+
+        /* NAVBAR CENTER */
+        .navbar .nav-center {
+            margin: 0 auto; /* Center the CART title */
+        }
+       
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background#0f1b33:;
+    padding:2px 20px;
+    color:white;
+}
+
+.nav-center {
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile-container {
+    position:relative;
+}
+
+.profile-pic {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+    cursor:pointer;
+}
+
+.profile-dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:55px;
+    background:#132440;
+    width:220px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:9999;
+}
+
+.profile-dropdown a {
+    display:block;
+    padding:10px;
+    color:white;
+    text-decoration:none;
+}
+
+.profile-dropdown a:hover {
+    background:#1a2e52;
+}
+
+    </style>
+</head>
+<body style="background:#0f1b33;">
+
+<!-- NAVBAR -->
+{% include "includes/navbar.html" with navbar_title="CART" %}
+
+<div class="page-container" style="flex-direction: column; padding: 20px;">
+
+{% if items %}
+<table>
+<tr>
+<th>Item</th>
+<th>Price</th>
+<th>Quantity</th>
+<th>Total</th>
+<th>Action</th>
+</tr>
+{% for item in items %}
+<tr>
+<td>{{ item.name }}</td>
+<td>₹{{ item.price }}</td>
+<td>
+    <button class="decrease-btn" data-stock="{{ item.id }}">➖</button>
+    <span id="item-qty-{{ item.id }}">{{ item.quantity }}</span>
+    <button class="increase-btn" data-stock="{{ item.id }}">➕</button>
+</td>
+<td>₹{{ item.total }}</td>
+<td>
+    <form method="post" action="{% url 'remove_from_cart' item.id %}">
+        {% csrf_token %}
+        <button type="submit">Remove</button>
+    </form>
+</td>
+</tr>
+{% endfor %}
+</table>
+
+<!-- TOTAL AMOUNT CENTERED -->
+<div class="cart-total-container">
+    <h3>Total Amount: ₹<span id="cart-total">{{ total }}</span></h3>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="cart-actions">
+    <button id="clear-cart-btn">🗑️ Clear Cart</button>
+    <a href="{% url 'menu' %}"><button>⬅ Continue Shopping</button></a>
+    <a href="{% url 'payment' %}"><button>💳 Proceed to Payment</button></a>
+
+</div>
+
+{% else %}
+<p style="text-align:center; font-size:18px;">Your cart is empty.</p>
+<div class="cart-actions">
+    <a href="{% url 'menu' %}"><button>⬅ Back to Menu</button></a>
+</div>
+{% endif %}
+
+</div>
+
+<script>
+// Increment / Decrement
+document.querySelectorAll('.increase-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const stockId = btn.dataset.stock;
+        fetch(`/ajax/increase/${stockId}/`).then(r=>r.json()).then(data=>{
+            document.getElementById(`item-qty-${stockId}`).textContent = data.item_qty;
+            document.getElementById('cart-total').textContent = data.cart_total.toFixed(2);
+        });
+    });
+});
+document.querySelectorAll('.decrease-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const stockId = btn.dataset.stock;
+        fetch(`/ajax/decrease/${stockId}/`).then(r=>r.json()).then(data=>{
+            if(data.item_qty>0){
+                document.getElementById(`item-qty-${stockId}`).textContent = data.item_qty;
+            } else {
+                btn.parentElement.parentElement.remove();
+            }
+            document.getElementById('cart-total').textContent = data.cart_total.toFixed(2);
+        });
+    });
+});
+
+// Clear Cart
+document.getElementById('clear-cart-btn').addEventListener('click', function(){
+    if(!confirm('Are you sure you want to clear the cart?')) return;
+    fetch("{% url 'clear_cart' %}", {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelectorAll('table tr').forEach((row, index) => { if(index!==0) row.remove(); });
+        document.getElementById('cart-total').textContent = data.cart_total.toFixed(2);
+    });
+});
+</script>
+
+</body>
+</html>

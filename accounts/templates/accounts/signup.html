@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up | SRMunch</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+</head>
+<body style="background:#0f1b33; font-family:'Segoe UI', sans-serif;">
+<div style="min-height:100vh; display:flex; justify-content:center; align-items:center;">
+    <div style="background:#132440; color:white; padding:40px; width:420px; border-radius:14px; box-shadow:0 0 18px rgba(0,0,0,0.45); display:flex; flex-direction:column; align-items:center;">
+        <img src="{% static 'canteen/logo.png' %}" style="width:200px; margin-bottom:10px;">
+        <h1 style="color:#ff9f1c; font-size:42px; margin-bottom:0;">SRMunch</h1>
+        <p style="color:#00e5ff; margin-bottom:20px;">Student Sign Up</p>
+
+        {% if error %}
+        <div id="serverError" style="background:#ffb3b3; color:#700; padding:10px; border-radius:6px; margin-bottom:15px; text-align:center; width:100%;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" style="width:100%;">
+            {% csrf_token %}
+            <div style="margin-bottom:16px;">
+                <label style="color:#ff9f1c;">SRM Email</label>
+                <input type="email" name="email" id="email" placeholder="yourname@srmist.edu.in" required style="width:100%; padding:14px 12px; border-radius:8px; border:none; background:#fdf6f0; color:#132440; box-sizing: border-box;">
+                <small id="emailError" style="color:#ff6b6b; display:none;"></small>
+                </div>
+            <div style="margin-bottom:16px;">
+                             <label style="color:#ff9f1c"> Full Name</label>
+<input type="text" name="full_name" placeholder="Enter your full name" required style="width:100%; padding:14px 12px; border-radius:8px; border:none; background:#fdf6f0; color:#132440; box-sizing: border-box;">
+                </div>
+
+            <div style="margin-bottom:16px;">
+                <label style="color:#ff9f1c;">Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter password" required style="width:100%; padding:14px 12px; border-radius:8px; border:none; background:#fdf6f0; color:#132440; box-sizing: border-box;">
+                <small id="passError" style="color:#ff6b6b; display:none;"></small>
+            </div>
+
+            <div style="margin-bottom:22px;">
+                <label style="color:#ff9f1c;">Confirm Password</label>
+                <input type="password" name="confirm_password" placeholder="Confirm password" required style="width:100%; padding:14px 12px; border-radius:8px; border:none; background:#fdf6f0; color:#132440; box-sizing: border-box;">
+            </div>
+
+            <button type="submit" style="width:100%; padding:14px; background:#00e5ff; border:none; border-radius:10px; font-weight:bold;">Sign Up</button>
+        </form>
+
+        <p style="text-align:center; margin-top:22px;">Already have an account? <a href="{% url 'student_login' %}" style="color:#00e5ff;">Login</a></p>
+    </div>
+</div>
+
+<script>
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const emailError = document.getElementById("emailError");
+const passError = document.getElementById("passError");
+const serverError = document.getElementById("serverError");
+
+// SRM email inline
+emailInput.addEventListener("blur", () => {
+    if (emailInput.value && !emailInput.value.endsWith("@srmist.edu.in")) {
+        emailError.style.display = "block";
+        emailError.textContent = "Only @srmist.edu.in email allowed";
+    } else emailError.style.display = "none";
+});
+
+// Password inline
+passInput.addEventListener("blur", () => {
+    if (passInput.value && passInput.value.length < 8) {
+        passError.style.display = "block";
+        passError.textContent = "Password must be at least 8 characters";
+    } else passError.style.display = "none";
+});
+
+// Hide backend box on typing
+emailInput.addEventListener("input", () => { if (serverError) serverError.style.display = "none"; });
+passInput.addEventListener("input", () => { if (serverError) serverError.style.display = "none"; });
+
+// Auto-hide backend box after 2s
+if (serverError && serverError.textContent.trim() !== "") {
+    setTimeout(() => serverError.style.display="none", 2000);
+}
+</script>
+</body>
+</html>

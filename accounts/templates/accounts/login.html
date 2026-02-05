@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login | SRMunch</title>
+    <link rel="stylesheet" href="{% static 'canteen/menu.css' %}">
+</head>
+
+<body style="background:#0f1b33; font-family:'Segoe UI', sans-serif;">
+
+<div style="min-height:100vh; display:flex; justify-content:center; align-items:center;">
+    <div style="
+        background:#132440;
+        color:white;
+        padding:40px;
+        width:420px;
+        border-radius:14px;
+        box-shadow:0 0 18px rgba(0,0,0,0.45);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    ">
+
+        <!-- Logo -->
+        <img src="{% static 'canteen/logo.png' %}" alt="SRMunch Logo"
+             style="width:200px; margin-bottom:15px;">
+
+        <h1 style="color:#ff9f1c; font-size:42px; margin-bottom:0;">SRMunch</h1>
+        <p style="color:#00e5ff; margin-bottom:25px;">Student Login</p>
+
+        <!-- Backend error (POST only) -->
+        {% if error %}
+        <div id="serverError"
+             style="background:#ffb3b3; color:#700; padding:10px; border-radius:6px; margin-bottom:15px; width:100%; text-align:center;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" style="width:100%;">
+            {% csrf_token %}
+
+            <!-- Email -->
+            <div style="margin-bottom:16px;">
+                <label style="color:#ff9f1c; font-weight:bold;">SRM Email</label>
+                <input type="email" name="email" id="email"
+                       placeholder="yourname@srmist.edu.in" required
+                       style="width:100%; padding:14px; border-radius:8px; border:none; background:#fdf6f0;box-sizing: border-box; color:#132440;">
+                <small id="emailError" style="color:#ff6b6b; display:none;"></small>
+            </div>
+
+            <!-- Password -->
+            <div style="margin-bottom:22px;">
+                <label style="color:#ff9f1c; font-weight:bold;">Password</label>
+                <input type="password" name="password" id="password"
+                       placeholder="Enter your password" required
+                       style="width:100%; padding:14px; border-radius:8px; border:none; background:#fdf6f0;box-sizing: border-box;">
+                <small id="passError" style="color:#ff6b6b; display:none;"></small>
+            </div>
+
+            <button type="submit"
+                    style="width:100%; padding:14px; background:#00e5ff; border:none; border-radius:10px; font-weight:bold;">
+                Login
+            </button>
+        </form>
+
+        <!-- Forgot password -->
+        <div style="margin-top:14px;">
+            <a href="{% url 'forgot_password' %}" style="color:#ff9f1c; font-size:14px;">
+                Forgot Password?
+            </a>
+        </div>
+
+        <!-- Signup -->
+        <div style="margin-top:18px;">
+            <p>Don’t have an account?
+                <a href="{% url 'student_signup' %}" style="color:#00e5ff;">Sign up</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const emailError = document.getElementById("emailError");
+const passError = document.getElementById("passError");
+const serverError = document.getElementById("serverError");
+
+/* ---------- Inline Email Validation ---------- */
+emailInput.addEventListener("input", () => {
+    if (!emailInput.value) {
+        emailError.style.display = "none";
+        return;
+    }
+
+    if (!emailInput.value.endsWith("@srmist.edu.in")) {
+        emailError.textContent = "Only @srmist.edu.in email allowed";
+        emailError.style.display = "block";
+    } else {
+        emailError.style.display = "none";
+    }
+
+    if (serverError) serverError.style.display = "none";
+});
+
+/* ---------- Inline Password Length ---------- */
+passInput.addEventListener("blur", () => {
+    if (passInput.value && passInput.value.length < 8) {
+        passError.textContent = "Password must be at least 8 characters";
+        passError.style.display = "block";
+    }
+});
+
+passInput.addEventListener("input", () => {
+    if (passInput.value.length >= 8) {
+        passError.style.display = "none";
+    }
+    if (serverError) serverError.style.display = "none";
+});
+
+/* ---------- Backend Error Auto-hide ---------- */
+if (serverError && serverError.textContent.trim() !== "") {
+    setTimeout(() => {
+        serverError.style.display = "none";
+    }, 2000);
+}
+</script>
+
+</body>
+</html>
