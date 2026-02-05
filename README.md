@@ -37,14 +37,18 @@ It aims to digitize and simplify the food ordering process in university canteen
 
 ## 📂 Project Structure
 
+## 📁 Project Structure
+
 smart_canteen/
-├── accounts/ # Authentication, profiles, user management
-├── canteen/ # Menu, cart, orders, payments
-├── food_images/ # Food item images
-├── smart_canteen/ # Core project settings (settings.py, urls.py, wsgi.py)
-├── media/ # User uploaded files (profile pictures, etc.)
+│
+├── accounts/              # Authentication, profiles, user management
+├── canteen/               # Menu, cart, orders, payments
+├── food_images/           # Food item images
+├── smart_canteen/         # Core project settings
+├── media/                 # User uploaded files (ignored in git)
 ├── manage.py
-└── db.sqlite3 # SQLite database (ignored in git)
+└── db.sqlite3             # SQLite database (ignored in git)
+
 
 
 ## ⚙️ Installation & Setup
